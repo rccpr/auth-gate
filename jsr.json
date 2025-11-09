@@ -1,7 +1,10 @@
 {
     "name": "@rccp/auth-gate",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "exports": {
         ".": "./index.ts"
+    },
+    "imports": {
+        "react": "npm:react@^18"
     }
 }
