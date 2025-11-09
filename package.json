@@ -1,7 +1,14 @@
 {
-  "name": "auth-gate",
+  "name": "@rccp/auth-gate",
+  "version": "0.0.1",
+  "license": "MIT",
+  "description": "A library for protecting Views in a React application",
+  "author": "Garox",
   "module": "index.ts",
   "type": "module",
+  "exports": {
+    ".": "./index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

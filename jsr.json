@@ -1,0 +1,7 @@
+{
+    "name": "@rccp/auth-gate",
+    "version": "0.0.1",
+    "exports": {
+        ".": "./index.ts"
+    }
+}

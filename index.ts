@@ -1,1 +1,3 @@
-console.log("Hello via Bun!");
+import { Gate } from "./src/ui/gate.tsx";
+
+export { Gate }; 
