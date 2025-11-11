@@ -1,0 +1,33 @@
+# Development files
+tsup.config.ts
+tsconfig.json
+biome.json
+deno.json
+
+# Build artifacts we don't need
+*.tsbuildinfo
+*.log
+
+# Git
+.git
+.gitignore
+.github/
+
+# IDE
+.idea
+.vscode
+.cursor
+
+# Dependencies
+node_modules
+
+# Tests and CI
+coverage
+*.test.ts
+*.spec.ts
+
+# Misc
+.DS_Store
+.env*
+*.tgz
+

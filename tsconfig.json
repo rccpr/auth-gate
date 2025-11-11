@@ -6,13 +6,20 @@
     "module": "Preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
-    "allowJs": true,
 
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
+
+    // Declaration generation for npm compatibility
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
     "noEmit": true,
+
+    // JSR "no slow types" compliance
+    "isolatedDeclarations": true,
 
     // Best practices
     "strict": true,
