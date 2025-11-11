@@ -15,6 +15,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Setup Node for npm publish
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Check npm login
+        run: npm whoami
+
       - uses: googleapis/release-please-action@v4
         id: release
         with:
@@ -49,12 +58,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: bun run build
 
-      - name: Setup Node for npm publish
-        if: ${{ steps.release.outputs.release_created == 'true' }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+
       - name: Login to npm
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: npm login
