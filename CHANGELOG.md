@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/rccpr/auth-gate/compare/auth-gate-v0.3.1...auth-gate-v0.3.2) (2025-11-16)
+
+
+### Bug Fixes
+
+* ci ([104cd48](https://github.com/rccpr/auth-gate/commit/104cd4859912d885e7771782bce87ccdc7349bee))
+
 ## [0.3.1](https://github.com/rccpr/auth-gate/compare/auth-gate-v0.3.0...auth-gate-v0.3.1) (2025-11-15)
 
 
