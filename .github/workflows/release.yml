@@ -6,9 +6,9 @@ on:
       - main
 
 permissions:
-  contents: write        # release-please/tagging
-  pull-requests: write   # release-please PRs
-  id-token: write        # OIDC for npm Trusted Publishing + JSR
+  contents: write # release-please/tagging
+  pull-requests: write # release-please PRs
+  id-token: write # OIDC for npm Trusted Publishing + JSR
 
 jobs:
   release-please:
@@ -20,8 +20,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Update npm
         run: npm install -g npm@latest
@@ -53,7 +53,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: bun run typecheck
 
-      - name: Build with tsup
+      - name: Build with tsdown
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: bun run build
 
@@ -64,4 +64,3 @@ jobs:
       - name: Publish to JSR
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: npx jsr publish
-

@@ -1,5 +1,5 @@
 # Development files
-tsup.config.ts
+tsdown.config.ts
 tsconfig.json
 biome.json
 deno.json
