@@ -27,16 +27,21 @@
   ],
   "scripts": {
     "build": "tsup",
+    "preinstall": "npx only-allow bun",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "bun x tsc --noEmit"
+    "typecheck": "bun x tsc --noEmit",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.5",
+    "@commitlint/cli": "^19.2.2",
+    "@commitlint/config-conventional": "^19.2.2",
     "@types/bun": "latest",
+    "husky": "^9.1.7",
     "tsup": "^8.3.5",
-    "typescript": "^5.7.2"
+    "typescript": "^5.9.3"
   },
   "peerDependencies": {
     "@types/react": "^19",
