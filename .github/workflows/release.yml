@@ -1,4 +1,4 @@
-name: Release (npm + JSR, Bun + Biome)
+name: Release 
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node for npm publish
+      - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -57,11 +57,9 @@ jobs:
         if: ${{ steps.release.outputs.release_created == 'true' }}
         run: bun run build
 
-      - name: Publish to npm with provenance
+      - name: Publish to npm
         if: ${{ steps.release.outputs.release_created == 'true' }}
-        run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish 
 
       - name: Publish to JSR
         if: ${{ steps.release.outputs.release_created == 'true' }}
