@@ -45,11 +45,17 @@
   },
   "peerDependencies": {
     "@types/react": "^19",
-    "react": "^19"
+    "react": "^19",
+    "@stackframe/stack": "^2.8.51"
+  },
+  "peerDependenciesMeta": {
+    "@stackframe/stack": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public",
-    "provenance": false
+    "provenance": true
   },
   "trustedDependencies": [
     "core-js"
