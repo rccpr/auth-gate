@@ -26,7 +26,8 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "preinstall": "npx only-allow bun",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
@@ -36,12 +37,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.5",
-    "@commitlint/cli": "^19.2.2",
-    "@commitlint/config-conventional": "^19.2.2",
+    "@commitlint/cli": "19.2.2",
+    "@commitlint/config-conventional": "19.2.2",
     "@types/bun": "latest",
-    "husky": "^9.1.7",
-    "tsup": "^8.3.5",
-    "typescript": "^5.9.3"
+    "husky": "9.1.7",
+    "tsdown": "0.16.4",
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
     "@types/react": "^19",
