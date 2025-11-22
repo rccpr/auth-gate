@@ -1,12 +1,34 @@
-# auth-gate
+# @rccpr/auth-gate
 
-A JSR-compliant React library for protecting views in your application with authentication gates.
+<p align='center'>
+  <img src='https://github.com/rccpr/auth-gate/blob/main/public/logo.png?raw=true' width=150 />
+</p>
+
+A React library for condionally rendering components in your application with authentication gates.
 
 Partially inspired by the Clerk [Protect component](https://github.com/clerk/javascript/blob/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2/packages/react/src/components/controlComponents.tsx#L94).
 
 ## Installation
 
-### From JSR (recommended)
+
+```
+### From npm
+
+```bash
+# npm
+npm install @rccpr/auth-gate
+
+# Yarn
+yarn add @rccpr/auth-gate
+
+# pnpm
+pnpm add @rccpr/auth-gate
+
+# Bun
+bun add @rccpr/auth-gate
+```
+
+### From JSR
 
 ```bash
 # Deno
@@ -23,23 +45,6 @@ pnpm dlx jsr add @rccpr/auth-gate
 
 # Bun
 bunx jsr add @rccpr/auth-gate
-```
-
-### From npm
-
-```bash
-# npm
-npm install @rccpr/auth-gate
-
-# Yarn
-yarn add @rccpr/auth-gate
-
-# pnpm
-pnpm add @rccpr/auth-gate
-
-# Bun
-bun add @rccpr/auth-gate
-```
 
 
 
@@ -73,16 +78,6 @@ bun run lint:fix
 # Format code
 bun run format
 ```
-
-### JSR Compliance
-
-This library follows JSR's ["no slow types"](https://jsr.io/docs/about-slow-types) policy:
-
-- ✅ All exported functions have explicit return types
-- ✅ All exported types are properly declared
-- ✅ `isolatedDeclarations: true` in TypeScript config
-- ✅ No destructuring in exports
-- ✅ No global or module augmentation
 
 
 ## License
