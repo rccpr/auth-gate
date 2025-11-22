@@ -1,7 +1,7 @@
 import { createContext, use, type JSX } from "react";
 
 export interface AuthGateAdapter<U> {
-	getUser(): Promise<U | null>;
+	getUser(): U;
 }
 
 export type AuthGateContextType<A extends AuthGateAdapter<unknown>> = {
@@ -33,3 +33,5 @@ export const createHooks = <A extends AuthGateAdapter<unknown>>(adapter: A): Cre
 		 AuthGateProvider,
 	};
 };
+
+
