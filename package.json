@@ -47,9 +47,14 @@
   "peerDependencies": {
     "@types/react": "^19",
     "react": "^19",
+    "@clerk/clerk-react": "^5.58.1",
+    "@clerk/types": "^4.101.6",
     "@stackframe/stack": "^2.8.51"
   },
   "peerDependenciesMeta": {
+    "@clerk/clerk-react": {
+      "optional": true
+    },
     "@stackframe/stack": {
       "optional": true
     }
