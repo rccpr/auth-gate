@@ -1,80 +1,83 @@
 {
-  "name": "@rccpr/auth-gate",
-  "version": "0.3.2",
-  "license": "MIT",
-  "private": false,
-  "description": "A library for conditional rendering components based on authentication/authorization",
-  "author": "Garox",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rccpr/auth-gate.git"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "files": [
-    "dist",
-    "src",
-    "LICENSE",
-    "README.md"
-  ],
-  "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "preinstall": "npx only-allow bun",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "bun x tsc --noEmit",
-    "prepare": "husky"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "2.3.5",
-    "@commitlint/cli": "19.2.2",
-    "@commitlint/config-conventional": "19.2.2",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/bun": "latest",
-    "@vitest/coverage-v8": "^4.0.18",
-    "husky": "9.1.7",
-    "jsdom": "26.0.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "tsdown": "0.16.4",
-    "typescript": "5.9.3",
-    "vitest": "^4.0.18"
-  },
-  "peerDependencies": {
-    "@types/react": "^19",
-    "react": "^19",
-    "@clerk/clerk-react": "^5.58.1",
-    "@clerk/types": "^4.101.6",
-    "@stackframe/stack": "^2.8.51"
-  },
-  "peerDependenciesMeta": {
-    "@clerk/clerk-react": {
-      "optional": true
-    },
-    "@stackframe/stack": {
-      "optional": true
-    }
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "trustedDependencies": [
-    "core-js"
-  ]
+	"name": "@rccpr/auth-gate",
+	"version": "0.3.2",
+	"license": "MIT",
+	"private": false,
+	"description": "A library for conditional rendering components based on authentication/authorization",
+	"author": "Garox",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/rccpr/auth-gate.git"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		}
+	},
+	"files": [
+		"dist",
+		"src",
+		"LICENSE",
+		"README.md"
+	],
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"preinstall": "npx only-allow bun",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"typecheck": "bun x tsc --noEmit",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.4",
+		"@commitlint/cli": "19.2.2",
+		"@commitlint/config-conventional": "19.2.2",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@types/bun": "latest",
+		"@vitest/coverage-v8": "^4.0.18",
+		"husky": "9.1.7",
+		"jsdom": "26.0.0",
+		"react": "^19.2.4",
+		"react-dom": "^19.2.4",
+		"tsdown": "0.16.4",
+		"typescript": "5.9.3",
+		"vitest": "^4.0.18"
+	},
+	"peerDependencies": {
+		"@types/react": "^19",
+		"react": "^19",
+		"@clerk/clerk-react": "^5.58.1",
+		"@clerk/types": "^4.101.6",
+		"@stackframe/stack": "^2.8.51"
+	},
+	"peerDependenciesMeta": {
+		"@clerk/clerk-react": {
+			"optional": true
+		},
+		"@stackframe/stack": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public",
+		"provenance": true
+	},
+	"trustedDependencies": [
+		"core-js"
+	],
+	"dependencies": {
+		"@playwright/experimental-ct-react": "^1.58.2"
+	}
 }

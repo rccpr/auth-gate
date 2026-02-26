@@ -59,3 +59,6 @@ All standard dev commands are in `package.json` scripts — see README.md "Avail
 Example apps live in `examples/`. Each has its own `package.json` and `node_modules`.
 
 - **`examples/clerk-vite/`** — Clerk integration playground (Vite + React). Requires `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local`. Run with `bun run dev` from that directory. Resolves `@rccpr/auth-gate` from source via Vite alias, so library changes hot-reload instantly.
+- E2e tests use Playwright Component Testing (`@playwright/experimental-ct-react`). Run with `bun run test:e2e`. Tests are in `e2e/` and use wrapper components in `e2e/helpers/` to provide mock auth context.
+- The `e2e/` directory is excluded from both `tsconfig.json` and `vitest.config.ts` to avoid conflicts between Playwright and Vitest test runners.
+- Pre-existing issue: `bun run build` fails because `src/index.ts` imports `./adapters/stack-auth.tsx` but the file is `stack-auth.ts`.

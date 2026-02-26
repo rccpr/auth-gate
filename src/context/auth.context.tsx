@@ -1,5 +1,6 @@
 import { createContext, type JSX, type ReactNode, use } from "react";
 import type { AuthAdapter, User } from "../adapters/adapter";
+import type { AuthGateAdapter } from "../core/create-auth-gate";
 
 /**
  * Props for the AuthGateProvider component.
@@ -168,4 +169,73 @@ export function createHooks<TAdapter extends AuthAdapter<unknown>>(
 	return {
 		AuthGateProvider,
 	};
+}
+
+export type AuthGateRuntimeValue<
+	TUser,
+	TPermission extends string = string,
+	TData = boolean,
+> = {
+	adapter: AuthGateAdapter<TUser, TPermission, TData>;
+};
+
+const AuthGateRuntimeContext = createContext<AuthGateRuntimeValue<
+	unknown,
+	string,
+	unknown
+> | null>(null);
+
+type AuthGateRuntimeProviderProps<
+	TUser,
+	TPermission extends string = string,
+	TData = boolean,
+> = {
+	value: AuthGateRuntimeValue<TUser, TPermission, TData>;
+	children: ReactNode;
+};
+
+/**
+ * Internal provider for auth-gate runtime values.
+ *
+ * This is used by `createAuthGate` to scope a concrete adapter instance to the
+ * generated gate components and hooks.
+ */
+export function AuthGateRuntimeProvider<
+	TUser,
+	TPermission extends string = string,
+	TData = boolean,
+>({
+	value,
+	children,
+}: AuthGateRuntimeProviderProps<TUser, TPermission, TData>): JSX.Element {
+	return (
+		<AuthGateRuntimeContext.Provider
+			value={value as unknown as AuthGateRuntimeValue<unknown, string, unknown>}
+		>
+			{children}
+		</AuthGateRuntimeContext.Provider>
+	);
+}
+
+/**
+ * Returns the internal auth-gate runtime context.
+ *
+ * This hook is used by gate components and hooks created through
+ * `createAuthGate` and should be considered internal runtime plumbing.
+ *
+ * @throws Error when used outside `AuthGateProvider`
+ */
+export function useAuthGateRuntime<
+	TUser,
+	TPermission extends string = string,
+	TData = boolean,
+>(): AuthGateRuntimeValue<TUser, TPermission, TData> {
+	const context = use(AuthGateRuntimeContext);
+	if (!context) {
+		throw new Error(
+			"useAuthGateRuntime must be used within an AuthGateProvider",
+		);
+	}
+
+	return context as unknown as AuthGateRuntimeValue<TUser, TPermission, TData>;
 }
