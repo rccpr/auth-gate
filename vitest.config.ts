@@ -5,6 +5,7 @@ const config: ViteUserConfigExport = defineConfig({
 		environment: "jsdom",
 		globals: true,
 		passWithNoTests: true,
+		exclude: ["e2e/**", "node_modules/**"],
 		setupFiles: ["./vitest.setup.ts"],
 			coverage: {
 				provider: "v8",
