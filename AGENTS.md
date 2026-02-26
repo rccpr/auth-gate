@@ -53,3 +53,6 @@ All standard dev commands are in `package.json` scripts — see README.md "Avail
 - The `commit-msg` hook references `pnpm commitlint` (not `bun`) — this may fail if pnpm is not installed. This is a known inconsistency in the repo.
 - The pre-commit hook runs `bun run typecheck` and `bun run lint:fix`.
 - Peer dependencies (`react`, `@types/react`) are installed automatically by Bun during `bun install`.
+- E2e tests use Playwright Component Testing (`@playwright/experimental-ct-react`). Run with `bun run test:e2e`. Tests are in `e2e/` and use wrapper components in `e2e/helpers/` to provide mock auth context.
+- The `e2e/` directory is excluded from both `tsconfig.json` and `vitest.config.ts` to avoid conflicts between Playwright and Vitest test runners.
+- Pre-existing issue: `bun run build` fails because `src/index.ts` imports `./adapters/stack-auth.tsx` but the file is `stack-auth.ts`.

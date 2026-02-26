@@ -10,6 +10,7 @@ const config: ViteUserConfigExport = defineConfig({
 			provider: "v8",
 			reporter: ["text", "html", "json-summary"],
 			include: ["src/**/*.{ts,tsx}"],
+			exclude: ["e2e/**", "node_modules/**"],
 		},
 	},
 });
