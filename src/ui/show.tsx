@@ -1,63 +1,24 @@
 import type { JSX, ReactNode } from "react";
 import { useAuthGateRuntime } from "../context/auth.context.tsx";
 import type {
+	AsyncAdapter,
 	AuthGateAdapter,
 	AuthGateToolkit,
 	ShowProps,
 	ShowWhen,
 	SignedInOutProps,
+	SyncAdapter,
 } from "../core/create-auth-gate";
-import type { AuthState, ConflictPolicy, DecisionState } from "../core/types";
+import type { AsyncLoadState, AuthState, HasCheck } from "../core/types";
 
-const defaultConflictPolicy: ConflictPolicy = "strict";
-
-function resolveConflictPolicy(
-	componentPolicy: ConflictPolicy | undefined,
-	adapterPolicy: ConflictPolicy | undefined,
-): ConflictPolicy {
-	return componentPolicy ?? adapterPolicy ?? defaultConflictPolicy;
+function isHasCheck<TPermission extends string>(
+	when: ShowWhen<TPermission>,
+): when is HasCheck<TPermission> {
+	return typeof when === "object" && when !== null;
 }
 
-function resolveHybridDecision<TUser, TPermission, TData>(
-	adapter: Extract<
-		AuthGateAdapter<TUser, TPermission, TData>,
-		{ mode: "hybrid" }
-	>,
-	permission: TPermission,
-	conflictPolicy: ConflictPolicy,
-): DecisionState<TData> {
-	const asyncDecision = adapter.checkPermissionAsync(permission);
-
-	if (conflictPolicy === "strict") {
-		return asyncDecision;
-	}
-
-	if (asyncDecision.status === "pending") {
-		return adapter.checkPermissionSync(permission);
-	}
-
-	return asyncDecision;
-}
-
-function resolvePermissionDecision<TUser, TPermission, TData>(
-	adapter: AuthGateAdapter<TUser, TPermission, TData>,
-	permission: TPermission,
-	conflictPolicy: ConflictPolicy,
-): DecisionState<TData> {
-	switch (adapter.mode) {
-		case "sync":
-			return adapter.checkPermission(permission);
-		case "async":
-			return adapter.checkPermission(permission);
-		case "hybrid":
-			return resolveHybridDecision(adapter, permission, conflictPolicy);
-		default:
-			return { status: "error", error: new Error("Unsupported adapter mode") };
-	}
-}
-
-function resolveIdentityGuard<TUser, TPermission>(
-	when: ShowWhen<TUser, TPermission>,
+function resolveIdentityGuard<TUser, TPermission extends string>(
+	when: ShowWhen<TPermission>,
 	authState: AuthState<TUser>,
 ): boolean {
 	if (when === "signed-in") {
@@ -68,18 +29,14 @@ function resolveIdentityGuard<TUser, TPermission>(
 		return !authState.isAuthenticated;
 	}
 
-	if (typeof when === "function") {
-		return when(authState);
-	}
-
 	return true;
 }
 
 function renderByDecision<TData>(
-	decision: DecisionState<TData>,
+	decision: AsyncLoadState<TData>,
 	children: ReactNode,
-	fallback: ShowProps<unknown>["fallback"],
-	loadingFallback: ShowProps<unknown>["loadingFallback"],
+	fallback: ShowProps["fallback"],
+	loadingFallback: ShowProps["loadingFallback"],
 ): JSX.Element {
 	if (decision.status === "allowed") {
 		return <>{children}</>;
@@ -92,23 +49,20 @@ function renderByDecision<TData>(
 	return <>{fallback ?? null}</>;
 }
 
-export function createShowComponents<
-	TUser,
-	TPermission = string,
-	TData = boolean,
->(): Pick<
-	AuthGateToolkit<TUser, TPermission, TData>,
-	"Show" | "Protect" | "SignedIn" | "SignedOut"
-> {
-	const Show = ({
+function createSyncShowComponent<TUser, TPermission extends string, TData>(
+	adapter: SyncAdapter<TUser, TPermission, TData>,
+): (props: ShowProps<TPermission>) => JSX.Element {
+	return ({
 		children,
 		when,
 		fallback,
 		loadingFallback,
-		conflictPolicy,
-	}: ShowProps<TUser, TPermission>): JSX.Element => {
-		const runtime = useAuthGateRuntime<TUser, TPermission, TData>();
-		const authState = runtime.adapter.useAuthState();
+	}: ShowProps<TPermission>): JSX.Element => {
+		useAuthGateRuntime<TUser, TPermission, TData>();
+
+		const authState = adapter.useAuthState();
+		const hasCheck = isHasCheck(when);
+		const decision = adapter.useAuthorizationDecision(hasCheck ? when : null);
 
 		if (authState.isLoading) {
 			return <>{loadingFallback ?? null}</>;
@@ -118,27 +72,62 @@ export function createShowComponents<
 			return <>{fallback ?? null}</>;
 		}
 
-		if (typeof when === "object" && when !== null && "permission" in when) {
-			const resolvedPolicy = resolveConflictPolicy(
-				conflictPolicy,
-				runtime.adapter.defaultConflictPolicy,
-			);
-			const permissionDecision = resolvePermissionDecision(
-				runtime.adapter,
-				when.permission,
-				resolvedPolicy,
-			);
-
-			return renderByDecision(
-				permissionDecision,
-				children,
-				fallback,
-				loadingFallback,
-			);
+		if (hasCheck) {
+			return renderByDecision(decision, children, fallback, loadingFallback);
 		}
 
 		return <>{children}</>;
 	};
+}
+
+function createAsyncShowComponent<TUser, TPermission extends string, TData>(
+	adapter: AsyncAdapter<TUser, TPermission, TData>,
+): (props: ShowProps<TPermission>) => JSX.Element {
+	return ({
+		children,
+		when,
+		fallback,
+		loadingFallback,
+	}: ShowProps<TPermission>): JSX.Element => {
+		useAuthGateRuntime<TUser, TPermission, TData>();
+
+		const authState = adapter.useAuthState();
+		const hasCheck = isHasCheck(when);
+		const decision = adapter.asyncResolver.useDecision(
+			hasCheck ? when : null,
+			adapter.getAuthorizationDecision,
+		);
+
+		if (authState.isLoading) {
+			return <>{loadingFallback ?? null}</>;
+		}
+
+		if (!resolveIdentityGuard(when, authState)) {
+			return <>{fallback ?? null}</>;
+		}
+
+		if (hasCheck) {
+			return renderByDecision(decision, children, fallback, loadingFallback);
+		}
+
+		return <>{children}</>;
+	};
+}
+
+export function createShowComponents<
+	TUser,
+	TPermission extends string = string,
+	TData = boolean,
+>(
+	adapter: AuthGateAdapter<TUser, TPermission, TData>,
+): Pick<
+	AuthGateToolkit<TUser, TPermission, TData>,
+	"Show" | "Protect" | "SignedIn" | "SignedOut"
+> {
+	const Show =
+		adapter.mode === "sync"
+			? createSyncShowComponent(adapter)
+			: createAsyncShowComponent(adapter);
 
 	const Protect = Show;
 
@@ -146,7 +135,7 @@ export function createShowComponents<
 		children,
 		fallback,
 		loadingFallback,
-	}: SignedInOutProps<TUser, TPermission>): JSX.Element => {
+	}: SignedInOutProps): JSX.Element => {
 		return (
 			<Show
 				when="signed-in"
@@ -162,7 +151,7 @@ export function createShowComponents<
 		children,
 		fallback,
 		loadingFallback,
-	}: SignedInOutProps<TUser, TPermission>): JSX.Element => {
+	}: SignedInOutProps): JSX.Element => {
 		return (
 			<Show
 				when="signed-out"
@@ -175,9 +164,9 @@ export function createShowComponents<
 	};
 
 	return {
-		Show: Show,
-		Protect: Protect,
-		SignedIn: SignedIn,
-		SignedOut: SignedOut,
+		Show,
+		Protect,
+		SignedIn,
+		SignedOut,
 	};
 }

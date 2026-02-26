@@ -1,21 +1,22 @@
 export type {
 	AsyncAdapter,
+	AsyncDecisionResolver,
 	AuthGateAdapter,
 	AuthGateSnapshot,
 	AuthGateToolkit,
-	HybridAdapter,
-	PermissionRequirement,
 	ShowProps,
 	ShowWhen,
 	SignedInOutProps,
 	SyncAdapter,
-	UseAuthGateOptions,
 } from "./core/create-auth-gate";
 export { createAuthGate } from "./core/create-auth-gate";
 export type {
+	AsyncLoadState,
+	AsyncLoadStatus,
 	AuthState,
 	ConflictPolicy,
 	DecisionState,
 	DecisionStatus,
+	HasCheck,
 } from "./core/types";
-export { decisionStatuses } from "./core/types";
+export { asyncLoadStatuses, decisionStatuses } from "./core/types";

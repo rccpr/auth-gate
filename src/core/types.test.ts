@@ -1,10 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { type DecisionState, decisionStatuses } from "./types";
+import { type AsyncLoadState, asyncLoadStatuses } from "./types";
 
-describe("DecisionState", () => {
+describe("AsyncLoadState", () => {
 	it("supports allowed status", () => {
-		const value: DecisionState<boolean> = { status: "allowed", data: true };
+		const value: AsyncLoadState<boolean> = { status: "allowed", data: true };
 		expect(value.status).toBe("allowed");
-		expect(decisionStatuses).toContain("allowed");
+		expect(asyncLoadStatuses).toContain("allowed");
+	});
+
+	it("exposes normalized statuses", () => {
+		expect(asyncLoadStatuses).toEqual([
+			"allowed",
+			"denied",
+			"pending",
+			"error",
+		]);
 	});
 });

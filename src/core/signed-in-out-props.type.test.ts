@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { createAuthGate } from "./create-auth-gate";
 
 describe("SignedIn/SignedOut prop contracts", () => {
-	it("rejects when, permission, and conflictPolicy props", () => {
+	it("rejects when and has-check props", () => {
 		const gate = createAuthGate<{ id: string }, string>({
 			mode: "sync",
 			useAuthState: () => ({
@@ -10,7 +10,7 @@ describe("SignedIn/SignedOut prop contracts", () => {
 				isAuthenticated: false,
 				isLoading: false,
 			}),
-			checkPermission: () => ({ status: "denied" }),
+			useAuthorizationDecision: () => ({ status: "denied" }),
 		});
 
 		type SignedInProps = Parameters<typeof gate.SignedIn>[0];
@@ -30,14 +30,14 @@ describe("SignedIn/SignedOut prop contracts", () => {
 			// @ts-expect-error SignedIn should not accept permission requirements
 			permission: "org:admin",
 		};
-		const invalidConflictPolicy: SignedInProps = {
+		const invalidRoleCheck: SignedInProps = {
 			children: "x",
-			// @ts-expect-error SignedIn should not accept `conflictPolicy`
-			conflictPolicy: "optimistic",
+			// @ts-expect-error SignedIn should not accept role requirement objects
+			role: "org:admin",
 		};
 
 		expect(invalidWhen).toBeDefined();
 		expect(invalidPermission).toBeDefined();
-		expect(invalidConflictPolicy).toBeDefined();
+		expect(invalidRoleCheck).toBeDefined();
 	});
 });

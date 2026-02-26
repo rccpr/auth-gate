@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createAuthGate } from "./create-auth-gate";
-import type { AuthState, DecisionState } from "./types";
+import type { AsyncLoadState, AuthState } from "./types";
 
 type TestUser = {
 	id: string;
 };
 
-describe("useAuthGate and hybrid conflict policy", () => {
+describe("useAuthGate", () => {
 	it("returns normalized auth snapshot", () => {
 		const authState: AuthState<TestUser> = {
 			user: { id: "user-1" },
@@ -18,7 +18,7 @@ describe("useAuthGate and hybrid conflict policy", () => {
 		const gate = createAuthGate<TestUser, string>({
 			mode: "sync",
 			useAuthState: () => authState,
-			checkPermission: () => ({ status: "allowed" }),
+			useAuthorizationDecision: () => ({ status: "allowed" }),
 		});
 
 		const Probe = () => {
@@ -41,7 +41,7 @@ describe("useAuthGate and hybrid conflict policy", () => {
 		expect(screen.getByText("user-1:true:false")).toBeInTheDocument();
 	});
 
-	it("provides permission evaluation helper from useAuthGate", () => {
+	it("provides has-check evaluation helper from useAuthGate", () => {
 		const gate = createAuthGate<TestUser, string>({
 			mode: "sync",
 			useAuthState: () => ({
@@ -49,14 +49,17 @@ describe("useAuthGate and hybrid conflict policy", () => {
 				isAuthenticated: true,
 				isLoading: false,
 			}),
-			checkPermission: (permission) => ({
-				status: permission === "org:read" ? "allowed" : "denied",
+			useAuthorizationDecision: (check) => ({
+				status:
+					check && "permission" in check && check.permission === "org:read"
+						? "allowed"
+						: "denied",
 			}),
 		});
 
 		const Probe = () => {
 			const snapshot = gate.useAuthGate();
-			const decision = snapshot.evaluatePermission("org:read");
+			const decision = snapshot.evaluate({ permission: "org:read" });
 
 			return <div>{decision.status}</div>;
 		};
@@ -70,95 +73,35 @@ describe("useAuthGate and hybrid conflict policy", () => {
 		expect(screen.getByText("allowed")).toBeInTheDocument();
 	});
 
-	it("strict policy keeps pending until async resolves in hybrid mode", () => {
-		let asyncDecision: DecisionState = { status: "pending" };
+	it("returns pending evaluation placeholder for async adapters", () => {
+		const asyncDecision: AsyncLoadState = { status: "pending" };
 
 		const gate = createAuthGate<TestUser, string>({
-			mode: "hybrid",
+			mode: "async",
 			useAuthState: () => ({
 				user: { id: "user-1" },
 				isAuthenticated: true,
 				isLoading: false,
 			}),
-			checkPermissionSync: () => ({ status: "allowed" }),
-			checkPermissionAsync: () => asyncDecision,
+			getAuthorizationDecision: async () => asyncDecision,
+			asyncResolver: {
+				useDecision: () => asyncDecision,
+			},
 		});
 
-		const { rerender } = render(
+		const Probe = () => {
+			const snapshot = gate.useAuthGate();
+			const decision = snapshot.evaluate({ permission: "org:admin" });
+
+			return <div>{decision.status}</div>;
+		};
+
+		render(
 			<gate.AuthGateProvider>
-				<gate.Show
-					when={{ permission: "org:admin" }}
-					fallback={<span>Denied</span>}
-					loadingFallback={<span>Pending</span>}
-				>
-					<span>Allowed</span>
-				</gate.Show>
+				<Probe />
 			</gate.AuthGateProvider>,
 		);
 
-		expect(screen.getByText("Pending")).toBeInTheDocument();
-
-		asyncDecision = { status: "allowed" };
-
-		rerender(
-			<gate.AuthGateProvider>
-				<gate.Show
-					when={{ permission: "org:admin" }}
-					fallback={<span>Denied</span>}
-					loadingFallback={<span>Pending</span>}
-				>
-					<span>Allowed</span>
-				</gate.Show>
-			</gate.AuthGateProvider>,
-		);
-
-		expect(screen.getByText("Allowed")).toBeInTheDocument();
-	});
-
-	it("optimistic policy allows sync allow first in hybrid mode", () => {
-		let asyncDecision: DecisionState = { status: "pending" };
-
-		const gate = createAuthGate<TestUser, string>({
-			mode: "hybrid",
-			useAuthState: () => ({
-				user: { id: "user-1" },
-				isAuthenticated: true,
-				isLoading: false,
-			}),
-			checkPermissionSync: () => ({ status: "allowed" }),
-			checkPermissionAsync: () => asyncDecision,
-		});
-
-		const { rerender } = render(
-			<gate.AuthGateProvider>
-				<gate.Show
-					when={{ permission: "org:admin" }}
-					conflictPolicy="optimistic"
-					fallback={<span>Denied</span>}
-					loadingFallback={<span>Pending</span>}
-				>
-					<span>Allowed</span>
-				</gate.Show>
-			</gate.AuthGateProvider>,
-		);
-
-		expect(screen.getByText("Allowed")).toBeInTheDocument();
-
-		asyncDecision = { status: "denied" };
-
-		rerender(
-			<gate.AuthGateProvider>
-				<gate.Show
-					when={{ permission: "org:admin" }}
-					conflictPolicy="optimistic"
-					fallback={<span>Denied</span>}
-					loadingFallback={<span>Pending</span>}
-				>
-					<span>Allowed</span>
-				</gate.Show>
-			</gate.AuthGateProvider>,
-		);
-
-		expect(screen.getByText("Denied")).toBeInTheDocument();
+		expect(screen.getByText("pending")).toBeInTheDocument();
 	});
 });

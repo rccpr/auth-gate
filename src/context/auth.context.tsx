@@ -173,7 +173,7 @@ export function createHooks<TAdapter extends AuthAdapter<unknown>>(
 
 export type AuthGateRuntimeValue<
 	TUser,
-	TPermission = string,
+	TPermission extends string = string,
 	TData = boolean,
 > = {
 	adapter: AuthGateAdapter<TUser, TPermission, TData>;
@@ -181,13 +181,13 @@ export type AuthGateRuntimeValue<
 
 const AuthGateRuntimeContext = createContext<AuthGateRuntimeValue<
 	unknown,
-	unknown,
+	string,
 	unknown
 > | null>(null);
 
 type AuthGateRuntimeProviderProps<
 	TUser,
-	TPermission = string,
+	TPermission extends string = string,
 	TData = boolean,
 > = {
 	value: AuthGateRuntimeValue<TUser, TPermission, TData>;
@@ -196,7 +196,7 @@ type AuthGateRuntimeProviderProps<
 
 export function AuthGateRuntimeProvider<
 	TUser,
-	TPermission = string,
+	TPermission extends string = string,
 	TData = boolean,
 >({
 	value,
@@ -204,7 +204,7 @@ export function AuthGateRuntimeProvider<
 }: AuthGateRuntimeProviderProps<TUser, TPermission, TData>): JSX.Element {
 	return (
 		<AuthGateRuntimeContext.Provider
-			value={value as AuthGateRuntimeValue<unknown, unknown, unknown>}
+			value={value as unknown as AuthGateRuntimeValue<unknown, string, unknown>}
 		>
 			{children}
 		</AuthGateRuntimeContext.Provider>
@@ -213,7 +213,7 @@ export function AuthGateRuntimeProvider<
 
 export function useAuthGateRuntime<
 	TUser,
-	TPermission = string,
+	TPermission extends string = string,
 	TData = boolean,
 >(): AuthGateRuntimeValue<TUser, TPermission, TData> {
 	const context = use(AuthGateRuntimeContext);
@@ -223,5 +223,5 @@ export function useAuthGateRuntime<
 		);
 	}
 
-	return context as AuthGateRuntimeValue<TUser, TPermission, TData>;
+	return context as unknown as AuthGateRuntimeValue<TUser, TPermission, TData>;
 }

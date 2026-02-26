@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { createAuthGate } from "../core/create-auth-gate";
-import type { AuthState, DecisionState } from "../core/types";
+import type { AsyncLoadState, AuthState, HasCheck } from "../core/types";
 
 type TestUser = {
 	id: string;
@@ -9,12 +9,12 @@ type TestUser = {
 
 function createSyncGate(
 	authState: AuthState<TestUser>,
-	decision: DecisionState = { status: "allowed" },
+	decision: AsyncLoadState = { status: "allowed" },
 ) {
 	return createAuthGate<TestUser, string>({
 		mode: "sync",
 		useAuthState: () => authState,
-		checkPermission: () => decision,
+		useAuthorizationDecision: () => decision,
 	});
 }
 
@@ -94,7 +94,7 @@ describe("Show", () => {
 		expect(screen.getByText("Signed out content")).toBeInTheDocument();
 	});
 
-	it("renders fallback for denied permission decision", () => {
+	it("renders fallback for denied authz decision", () => {
 		const gate = createSyncGate(
 			{
 				user: { id: "user-1" },
@@ -118,7 +118,7 @@ describe("Show", () => {
 		expect(screen.getByText("Denied")).toBeInTheDocument();
 	});
 
-	it("renders loadingFallback for pending permission decision", () => {
+	it("renders loadingFallback for pending authz decision", () => {
 		const gate = createSyncGate(
 			{
 				user: { id: "user-1" },
@@ -140,6 +140,34 @@ describe("Show", () => {
 		);
 
 		expect(screen.getByText("Pending permission")).toBeInTheDocument();
+	});
+
+	it("supports role, feature and plan checks", () => {
+		let lastCheck: HasCheck<string> | null = null;
+		const gate = createAuthGate<TestUser, string>({
+			mode: "sync",
+			useAuthState: () => ({
+				user: { id: "user-1" },
+				isAuthenticated: true,
+				isLoading: false,
+			}),
+			useAuthorizationDecision: (check) => {
+				lastCheck = check;
+				return { status: "allowed" };
+			},
+		});
+
+		render(
+			<gate.AuthGateProvider>
+				<gate.Show when={{ role: "org:admin" }}>
+					r<gate.Show when={{ feature: "teams" }}>f</gate.Show>
+					<gate.Show when={{ plan: "pro" }}>p</gate.Show>
+				</gate.Show>
+			</gate.AuthGateProvider>,
+		);
+
+		expect(lastCheck).not.toBeNull();
+		expect(screen.getByText("rfp")).toBeInTheDocument();
 	});
 
 	it("Protect behaves as Show alias", () => {
