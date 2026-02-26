@@ -57,22 +57,71 @@ export type SignedInOutProps<TUser, TPermission = string> = Omit<
 	"when"
 >;
 
+export type UseAuthGateOptions = {
+	conflictPolicy?: ConflictPolicy;
+};
+
+export type AuthGateSnapshot<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+> = AuthState<TUser> & {
+	evaluatePermission: (
+		permission: TPermission,
+		options?: UseAuthGateOptions,
+	) => DecisionState<TData>;
+};
+
 type AuthGateProviderProps = {
 	children: ReactNode;
 };
 
-export type AuthGateToolkit<TUser, TPermission = string> = {
+export type AuthGateToolkit<TUser, TPermission = string, TData = boolean> = {
 	AuthGateProvider: (props: AuthGateProviderProps) => JSX.Element;
 	Show: (props: ShowProps<TUser, TPermission>) => JSX.Element;
 	Protect: (props: ShowProps<TUser, TPermission>) => JSX.Element;
 	SignedIn: (props: SignedInOutProps<TUser, TPermission>) => JSX.Element;
 	SignedOut: (props: SignedInOutProps<TUser, TPermission>) => JSX.Element;
-	useAuthGate: () => AuthState<TUser>;
+	useAuthGate: () => AuthGateSnapshot<TUser, TPermission, TData>;
 };
+
+function resolveConflictPolicy(
+	componentPolicy: ConflictPolicy | undefined,
+	adapterPolicy: ConflictPolicy | undefined,
+): ConflictPolicy {
+	return componentPolicy ?? adapterPolicy ?? "strict";
+}
+
+function resolvePermissionDecision<TUser, TPermission, TData>(
+	adapter: AuthGateAdapter<TUser, TPermission, TData>,
+	permission: TPermission,
+	conflictPolicy: ConflictPolicy,
+): DecisionState<TData> {
+	switch (adapter.mode) {
+		case "sync":
+			return adapter.checkPermission(permission);
+		case "async":
+			return adapter.checkPermission(permission);
+		case "hybrid": {
+			const asyncDecision = adapter.checkPermissionAsync(permission);
+			if (conflictPolicy === "strict") {
+				return asyncDecision;
+			}
+
+			if (asyncDecision.status === "pending") {
+				return adapter.checkPermissionSync(permission);
+			}
+
+			return asyncDecision;
+		}
+		default:
+			return { status: "error", error: new Error("Unsupported adapter mode") };
+	}
+}
 
 export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 	adapter: AuthGateAdapter<TUser, TPermission, TData>,
-): AuthGateToolkit<TUser, TPermission> {
+): AuthGateToolkit<TUser, TPermission, TData> {
 	const AuthGateProvider = ({ children }: AuthGateProviderProps): JSX.Element => {
 		const value: AuthGateRuntimeValue<TUser, TPermission, TData> = { adapter };
 
@@ -81,9 +130,26 @@ export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 
 	const showComponents = createShowComponents<TUser, TPermission, TData>();
 
-	const useAuthGate = (): AuthState<TUser> => {
+	const useAuthGate = (): AuthGateSnapshot<TUser, TPermission, TData> => {
 		const runtime = useAuthGateRuntime<TUser, TPermission, TData>();
-		return runtime.adapter.useAuthState();
+		const authState = runtime.adapter.useAuthState();
+
+		const evaluatePermission = (
+			permission: TPermission,
+			options?: UseAuthGateOptions,
+		): DecisionState<TData> => {
+			const conflictPolicy = resolveConflictPolicy(
+				options?.conflictPolicy,
+				runtime.adapter.defaultConflictPolicy,
+			);
+
+			return resolvePermissionDecision(runtime.adapter, permission, conflictPolicy);
+		};
+
+		return {
+			...authState,
+			evaluatePermission: evaluatePermission,
+		};
 	};
 
 	return {

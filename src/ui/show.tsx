@@ -93,7 +93,10 @@ export function createShowComponents<
 	TUser,
 	TPermission = string,
 	TData = boolean,
->(): Pick<AuthGateToolkit<TUser, TPermission>, "Show" | "Protect" | "SignedIn" | "SignedOut"> {
+>(): Pick<
+	AuthGateToolkit<TUser, TPermission, TData>,
+	"Show" | "Protect" | "SignedIn" | "SignedOut"
+> {
 	const Show = ({
 		children,
 		when,
