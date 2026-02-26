@@ -36,6 +36,7 @@
 		"test:watch": "vitest",
 		"test:run": "vitest run",
 		"test:coverage": "vitest run --coverage",
+		"test:e2e": "playwright test -c playwright-ct.config.ts",
 		"typecheck": "bun x tsc --noEmit",
 		"prepare": "husky"
 	},

@@ -21,7 +21,8 @@
 ## Testing and verification
 - Run `bun run typecheck` and `bun run lint` before finishing changes.
 - Run `bun run build` for export/type output validation.
-- If tests exist, run `bun run test`.
+- Unit tests (Vitest): `bun run test` — runs tests in `src/`.
+- E2E component tests (Playwright CT): `bun run test:e2e` — runs tests in `e2e/`.
 
 ## Design guidance for this repo
 - Favor `Show` naming for conditional rendering semantics.
@@ -53,6 +54,17 @@ All standard dev commands are in `package.json` scripts — see README.md "Avail
 - The `commit-msg` hook references `pnpm commitlint` (not `bun`) — this may fail if pnpm is not installed. This is a known inconsistency in the repo.
 - The pre-commit hook runs `bun run typecheck` and `bun run lint:fix`.
 - Peer dependencies (`react`, `@types/react`) are installed automatically by Bun during `bun install`.
-- E2e tests use Playwright Component Testing (`@playwright/experimental-ct-react`). Run with `bun run test:e2e`. Tests are in `e2e/` and use wrapper components in `e2e/helpers/` to provide mock auth context.
-- The `e2e/` directory is excluded from both `tsconfig.json` and `vitest.config.ts` to avoid conflicts between Playwright and Vitest test runners.
-- Pre-existing issue: `bun run build` fails because `src/index.ts` imports `./adapters/stack-auth.tsx` but the file is `stack-auth.ts`.
+
+### Testing architecture
+
+- **Unit tests** (`src/**/*.test.{ts,tsx}`) use Vitest + Testing Library + jsdom. Run with `bun run test`.
+- **E2E component tests** (`e2e/*.spec.tsx`) use Playwright Component Testing (`@playwright/experimental-ct-react`). Run with `bun run test:e2e`. Requires Chromium: `npx playwright install chromium`.
+- The `e2e/` directory is excluded from both `tsconfig.json` and `vitest.config.ts` to avoid conflicts between the two test runners.
+- E2E tests mount React components directly in a real browser via `playwright/index.html` + `playwright/index.tsx`.
+- Mock adapters live in `e2e/helpers/`: `MockAdapter.ts` (old `AuthAdapter` API) and `mock-sync-adapter.ts` (new `createAuthGate` `SyncAdapter` API). New tests should use `mock-sync-adapter.ts` and the `GateTestWrapper.tsx` component.
+
+### Example projects
+
+Example apps live in `examples/`. Each has its own `package.json` and `node_modules`.
+
+- **`examples/clerk-vite/`** — Clerk integration playground (Vite + React). Requires `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local`. Run with `bun run dev` from that directory. Resolves `@rccpr/auth-gate` from source via Vite alias, so library changes hot-reload instantly.

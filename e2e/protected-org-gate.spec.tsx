@@ -1,6 +1,5 @@
 /** biome-ignore-all lint/a11y/useValidAriaRole: role is not an aria role */
 import { expect, test } from "@playwright/experimental-ct-react";
-import React from "react";
 import type { MockAdapterConfig } from "./helpers/MockAdapter";
 import { ProtectedOrgGateWrapper } from "./helpers/ProtectedOrgGateWrapper";
 

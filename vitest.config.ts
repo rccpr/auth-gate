@@ -6,6 +6,7 @@ const config: ViteUserConfigExport = defineConfig({
 		globals: true,
 		passWithNoTests: true,
 		setupFiles: ["./src/test/setup.ts"],
+		exclude: ["e2e/**", "node_modules/**", "examples/**"],
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "html", "json-summary"],
