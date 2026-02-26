@@ -1,6 +1,22 @@
-export { createClerkAuthAdapter } from "./adapters/clerk/adapter.tsx";
-export { createStackAuthAdapter } from "./adapters/stack-auth.tsx";
-export { createHooks, useAuth } from "./context/auth.context.tsx";
-export { AuthenticatedGate } from "./ui/authenticated-gate.tsx";
-export { PermissionGate } from "./ui/permission-gate.tsx";
-export { ProtectedOrgGate } from "./ui/protected-org-gate.tsx";
+export type {
+	AsyncAdapter,
+	AsyncDecisionResolver,
+	AuthGateAdapter,
+	AuthGateSnapshot,
+	AuthGateToolkit,
+	ShowProps,
+	ShowWhen,
+	SignedInOutProps,
+	SyncAdapter,
+} from "./core/create-auth-gate";
+export { createAuthGate } from "./core/create-auth-gate";
+export type {
+	AsyncLoadState,
+	AsyncLoadStatus,
+	AuthState,
+	ConflictPolicy,
+	DecisionState,
+	DecisionStatus,
+	HasCheck,
+} from "./core/types";
+export { asyncLoadStatuses, decisionStatuses } from "./core/types";

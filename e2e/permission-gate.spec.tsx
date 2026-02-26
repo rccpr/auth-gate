@@ -1,6 +1,6 @@
-import { test, expect } from "@playwright/experimental-ct-react";
-import { PermissionGateWrapper } from "./helpers/PermissionGateWrapper";
+import { expect, test } from "@playwright/experimental-ct-react";
 import type { MockAdapterConfig } from "./helpers/MockAdapter";
+import { PermissionGateWrapper } from "./helpers/PermissionGateWrapper";
 
 const adminUser: MockAdapterConfig = {
 	user: { id: "user-1", name: "Admin", email: "admin@example.com" },
@@ -52,7 +52,9 @@ test.describe("PermissionGate", () => {
 		);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
-		await expect(page.getByText("You do not have the necessary permissions")).toBeVisible();
+		await expect(
+			page.getByText("You do not have the necessary permissions"),
+		).toBeVisible();
 	});
 
 	test("renders fallback when user lacks the required permission", async ({
@@ -86,7 +88,9 @@ test.describe("PermissionGate", () => {
 		);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
-		await expect(page.getByText("You do not have access to this content")).toBeVisible();
+		await expect(
+			page.getByText("You do not have access to this content"),
+		).toBeVisible();
 	});
 
 	test("allows access when user has at least one of multiple permissions (requireAll=false)", async ({
@@ -119,7 +123,9 @@ test.describe("PermissionGate", () => {
 		);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
-		await expect(page.getByText("You do not have the necessary permissions")).toBeVisible();
+		await expect(
+			page.getByText("You do not have the necessary permissions"),
+		).toBeVisible();
 	});
 
 	test("allows access when user has all required permissions with requireAll=true", async ({

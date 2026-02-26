@@ -1,6 +1,8 @@
-import { test, expect } from "@playwright/experimental-ct-react";
-import { ProtectedOrgGateWrapper } from "./helpers/ProtectedOrgGateWrapper";
+/** biome-ignore-all lint/a11y/useValidAriaRole: role is not an aria role */
+import { expect, test } from "@playwright/experimental-ct-react";
+import React from "react";
 import type { MockAdapterConfig } from "./helpers/MockAdapter";
+import { ProtectedOrgGateWrapper } from "./helpers/ProtectedOrgGateWrapper";
 
 const orgAdmin: MockAdapterConfig = {
 	user: { id: "user-1", name: "Org Admin", email: "admin@org.com" },
@@ -52,7 +54,9 @@ test.describe("ProtectedOrgGate", () => {
 		);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
-		await expect(page.getByText("You do not have the necessary roles")).toBeVisible();
+		await expect(
+			page.getByText("You do not have the necessary roles"),
+		).toBeVisible();
 	});
 
 	test("renders fallback when user lacks the required role", async ({
@@ -70,9 +74,7 @@ test.describe("ProtectedOrgGate", () => {
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
 		await expect(page.getByTestId("fallback")).toBeVisible();
-		await expect(page.getByTestId("fallback")).toHaveText(
-			"Insufficient role",
-		);
+		await expect(page.getByTestId("fallback")).toHaveText("Insufficient role");
 	});
 
 	test("shows denial message when user is not authenticated", async ({
@@ -88,7 +90,9 @@ test.describe("ProtectedOrgGate", () => {
 		);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
-		await expect(page.getByText("You do not have access to this content")).toBeVisible();
+		await expect(
+			page.getByText("You do not have access to this content"),
+		).toBeVisible();
 	});
 
 	test("allows access when user has at least one of multiple roles (requireAll=false)", async ({

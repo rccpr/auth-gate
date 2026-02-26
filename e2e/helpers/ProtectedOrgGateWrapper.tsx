@@ -1,6 +1,6 @@
 import { createHooks } from "../../src/context/auth.context";
 import { ProtectedOrgGate } from "../../src/ui/protected-org-gate";
-import { MockAuthAdapter, type MockAdapterConfig } from "./MockAdapter";
+import { type MockAdapterConfig, MockAuthAdapter } from "./MockAdapter";
 
 type Props = {
 	config: MockAdapterConfig;
@@ -26,7 +26,9 @@ export function ProtectedOrgGateWrapper({
 				organizationId={organizationId}
 				role={role}
 				requireAll={requireAll}
-				fallback={fallback ? <div data-testid="fallback">{fallback}</div> : undefined}
+				fallback={
+					fallback ? <div data-testid="fallback">{fallback}</div> : undefined
+				}
 			>
 				<div data-testid="protected-content">Org-Protected Content</div>
 			</ProtectedOrgGate>

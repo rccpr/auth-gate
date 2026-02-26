@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/experimental-ct-react";
+import { expect, test } from "@playwright/experimental-ct-react";
 import { AuthenticatedGateWrapper } from "./helpers/AuthenticatedGateWrapper";
 import type { MockAdapterConfig } from "./helpers/MockAdapter";
 
@@ -19,9 +19,7 @@ test.describe("AuthenticatedGate", () => {
 		mount,
 		page,
 	}) => {
-		await mount(
-			<AuthenticatedGateWrapper config={authenticatedUser} />,
-		);
+		await mount(<AuthenticatedGateWrapper config={authenticatedUser} />);
 
 		await expect(page.getByTestId("protected-content")).toBeVisible();
 		await expect(page.getByTestId("protected-content")).toHaveText(
@@ -33,9 +31,7 @@ test.describe("AuthenticatedGate", () => {
 		mount,
 		page,
 	}) => {
-		await mount(
-			<AuthenticatedGateWrapper config={unauthenticatedUser} />,
-		);
+		await mount(<AuthenticatedGateWrapper config={unauthenticatedUser} />);
 
 		await expect(page.getByTestId("protected-content")).toBeHidden();
 	});
