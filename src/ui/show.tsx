@@ -114,6 +114,15 @@ function createAsyncShowComponent<TUser, TPermission extends string, TData>(
 	};
 }
 
+/**
+ * Builds gate UI components bound to a specific auth adapter instance.
+ *
+ * @typeParam TUser - User model returned by the adapter
+ * @typeParam TPermission - Permission key type accepted by `HasCheck`
+ * @typeParam TData - Optional adapter decision payload type
+ * @param adapter - Sync or async auth-gate adapter
+ * @returns `Show`, `Protect`, `SignedIn`, and `SignedOut` components
+ */
 export function createShowComponents<
 	TUser,
 	TPermission extends string = string,
@@ -124,13 +133,28 @@ export function createShowComponents<
 	AuthGateToolkit<TUser, TPermission, TData>,
 	"Show" | "Protect" | "SignedIn" | "SignedOut"
 > {
+	/**
+	 * Canonical UI gate component for auth and authorization-based rendering.
+	 *
+	 * Resolution order:
+	 * 1) auth loading
+	 * 2) identity guard (`signed-in` / `signed-out`)
+	 * 3) authorization check (`HasCheck`)
+	 * 4) render by `AsyncLoadState`
+	 */
 	const Show =
 		adapter.mode === "sync"
 			? createSyncShowComponent(adapter)
 			: createAsyncShowComponent(adapter);
 
+	/**
+	 * Compatibility alias for `Show`.
+	 */
 	const Protect = Show;
 
+	/**
+	 * Convenience wrapper for `Show` with `when="signed-in"`.
+	 */
 	const SignedIn = ({
 		children,
 		fallback,
@@ -147,6 +171,9 @@ export function createShowComponents<
 		);
 	};
 
+	/**
+	 * Convenience wrapper for `Show` with `when="signed-out"`.
+	 */
 	const SignedOut = ({
 		children,
 		fallback,

@@ -43,8 +43,11 @@ const gate = createAuthGate<User, string>({
 		isAuthenticated: true,
 		isLoading: false,
 	}),
-	checkPermission: (permission) => {
-		if (permission === "org:admin") return { status: "allowed" };
+	useAuthorizationDecision: (check) => {
+		if (check && "permission" in check && check.permission === "org:admin") {
+			return { status: "allowed" };
+		}
+
 		return { status: "denied" };
 	},
 });
@@ -61,16 +64,24 @@ export const {
 
 ## Adapter modes
 
-- `sync`: permission decisions are immediate
-- `async`: permission decisions come from hook-managed async state (`allowed | denied | pending | error`)
-- `hybrid`: both sync and async lanes are available
+- `sync`: decisions come from hook-native adapter methods (`use*`)
+- `async`: decisions come from promise-native adapter methods (`get*`) and a resolver hook
 
-The decision state machine is:
+The normalized async load state is:
 
 - `allowed`
 - `denied`
 - `pending`
 - `error`
+
+## Has checks
+
+`Show` authz checks follow Clerk-style `has()` input objects:
+
+- `{ permission: "org:billing:manage" }`
+- `{ role: "org:admin" }`
+- `{ feature: "teams" }`
+- `{ plan: "pro" }`
 
 ## Show examples
 
@@ -96,18 +107,34 @@ The decision state machine is:
 </Protect>
 ```
 
-## Hybrid conflict policy
+## Async adapter example
 
-`Show` supports per-component conflict policy:
+```tsx
+import { createAuthGate } from "@rccpr/auth-gate";
 
-- `strict` (default): async decision is authoritative
-- `optimistic`: sync decision may render first while async is pending
+const gate = createAuthGate({
+	mode: "async",
+	useAuthState: useMyAuthState,
+	getAuthorizationDecision: async (check) => {
+		const allowed = await api.can(check);
+		return allowed ? { status: "allowed" } : { status: "denied" };
+	},
+	asyncResolver: {
+		useDecision: useAuthorizationDecisionFromQuery,
+	},
+});
+```
 
-Precedence:
+## `useAuthGate`
 
-1. `Show` prop `conflictPolicy`
-2. adapter `defaultConflictPolicy`
-3. library default `strict`
+`useAuthGate` returns normalized auth data and an `evaluate(check)` helper:
+
+```tsx
+const snapshot = useAuthGate();
+const state = snapshot.evaluate({ permission: "org:read" });
+```
+
+For async adapters, `evaluate(check)` returns `pending` and `Show` should be preferred for rendered gating.
 
 ## Development
 

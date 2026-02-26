@@ -100,6 +100,35 @@ function defaultAsyncLoadState<TData>(): AsyncLoadState<TData> {
 	return { status: "pending" };
 }
 
+/**
+ * Creates a provider-bound auth-gate toolkit from a single adapter.
+ *
+ * The returned toolkit exposes the canonical gate components (`Show`, `Protect`,
+ * `SignedIn`, `SignedOut`) and the `useAuthGate` hook for normalized auth state
+ * plus authorization evaluation.
+ *
+ * @typeParam TUser - User model returned by the adapter
+ * @typeParam TPermission - Permission key type accepted by `HasCheck`
+ * @typeParam TData - Optional adapter decision payload type
+ * @param adapter - Sync or async adapter implementation
+ * @returns A fully wired auth-gate toolkit
+ *
+ * @example
+ * ```tsx
+ * const gate = createAuthGate({
+ * 	mode: "sync",
+ * 	useAuthState: useMyAuthState,
+ * 	useAuthorizationDecision: (check) =>
+ * 		check && "permission" in check && check.permission === "org:admin"
+ * 			? { status: "allowed" }
+ * 			: { status: "denied" },
+ * });
+ *
+ * <gate.Show when={{ permission: "org:admin" }} fallback={<NoAccess />}>
+ * 	<AdminPanel />
+ * </gate.Show>
+ * ```
+ */
 export function createAuthGate<
 	TUser,
 	TPermission extends string = string,

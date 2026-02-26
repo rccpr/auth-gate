@@ -194,6 +194,12 @@ type AuthGateRuntimeProviderProps<
 	children: ReactNode;
 };
 
+/**
+ * Internal provider for auth-gate runtime values.
+ *
+ * This is used by `createAuthGate` to scope a concrete adapter instance to the
+ * generated gate components and hooks.
+ */
 export function AuthGateRuntimeProvider<
 	TUser,
 	TPermission extends string = string,
@@ -211,6 +217,14 @@ export function AuthGateRuntimeProvider<
 	);
 }
 
+/**
+ * Returns the internal auth-gate runtime context.
+ *
+ * This hook is used by gate components and hooks created through
+ * `createAuthGate` and should be considered internal runtime plumbing.
+ *
+ * @throws Error when used outside `AuthGateProvider`
+ */
 export function useAuthGateRuntime<
 	TUser,
 	TPermission extends string = string,
