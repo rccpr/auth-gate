@@ -4,6 +4,7 @@ import {
 	type AuthGateRuntimeValue,
 	useAuthGateRuntime,
 } from "../context/auth.context.tsx";
+import { createShowComponents } from "../ui/show";
 import type { AuthState, ConflictPolicy, DecisionState } from "./types";
 
 export type SyncAdapter<TUser, TPermission = string, TData = boolean> = {
@@ -16,7 +17,7 @@ export type SyncAdapter<TUser, TPermission = string, TData = boolean> = {
 export type AsyncAdapter<TUser, TPermission = string, TData = boolean> = {
 	mode: "async";
 	useAuthState: () => AuthState<TUser>;
-	checkPermission: (permission: TPermission) => Promise<DecisionState<TData>>;
+	checkPermission: (permission: TPermission) => DecisionState<TData>;
 	defaultConflictPolicy?: ConflictPolicy;
 };
 
@@ -24,7 +25,7 @@ export type HybridAdapter<TUser, TPermission = string, TData = boolean> = {
 	mode: "hybrid";
 	useAuthState: () => AuthState<TUser>;
 	checkPermissionSync: (permission: TPermission) => DecisionState<TData>;
-	checkPermissionAsync: (permission: TPermission) => Promise<DecisionState<TData>>;
+	checkPermissionAsync: (permission: TPermission) => DecisionState<TData>;
 	defaultConflictPolicy?: ConflictPolicy;
 };
 
@@ -33,14 +34,28 @@ export type AuthGateAdapter<TUser, TPermission = string, TData = boolean> =
 	| AsyncAdapter<TUser, TPermission, TData>
 	| HybridAdapter<TUser, TPermission, TData>;
 
-export type ShowProps<TPermission = string> = {
+export type PermissionRequirement<TPermission> = {
+	permission: TPermission;
+};
+
+export type ShowWhen<TUser, TPermission = string> =
+	| "signed-in"
+	| "signed-out"
+	| PermissionRequirement<TPermission>
+	| ((authState: AuthState<TUser>) => boolean);
+
+export type ShowProps<TUser, TPermission = string> = {
 	children: ReactNode;
+	when: ShowWhen<TUser, TPermission>;
 	fallback?: ReactNode;
 	loadingFallback?: ReactNode;
-	when?: "signed-in" | "signed-out";
-	permission?: TPermission;
 	conflictPolicy?: ConflictPolicy;
 };
+
+export type SignedInOutProps<TUser, TPermission = string> = Omit<
+	ShowProps<TUser, TPermission>,
+	"when"
+>;
 
 type AuthGateProviderProps = {
 	children: ReactNode;
@@ -48,10 +63,10 @@ type AuthGateProviderProps = {
 
 export type AuthGateToolkit<TUser, TPermission = string> = {
 	AuthGateProvider: (props: AuthGateProviderProps) => JSX.Element;
-	Show: (props: ShowProps<TPermission>) => JSX.Element;
-	Protect: (props: ShowProps<TPermission>) => JSX.Element;
-	SignedIn: (props: ShowProps<TPermission>) => JSX.Element;
-	SignedOut: (props: ShowProps<TPermission>) => JSX.Element;
+	Show: (props: ShowProps<TUser, TPermission>) => JSX.Element;
+	Protect: (props: ShowProps<TUser, TPermission>) => JSX.Element;
+	SignedIn: (props: SignedInOutProps<TUser, TPermission>) => JSX.Element;
+	SignedOut: (props: SignedInOutProps<TUser, TPermission>) => JSX.Element;
 	useAuthGate: () => AuthState<TUser>;
 };
 
@@ -64,26 +79,7 @@ export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 		return <AuthGateRuntimeProvider value={value}>{children}</AuthGateRuntimeProvider>;
 	};
 
-	const Show = ({ children }: ShowProps<TPermission>): JSX.Element => <>{children}</>;
-	const Protect = Show;
-	const SignedIn = ({
-		children,
-		fallback,
-		loadingFallback,
-	}: ShowProps<TPermission>): JSX.Element => (
-		<Show when="signed-in" fallback={fallback} loadingFallback={loadingFallback}>
-			{children}
-		</Show>
-	);
-	const SignedOut = ({
-		children,
-		fallback,
-		loadingFallback,
-	}: ShowProps<TPermission>): JSX.Element => (
-		<Show when="signed-out" fallback={fallback} loadingFallback={loadingFallback}>
-			{children}
-		</Show>
-	);
+	const showComponents = createShowComponents<TUser, TPermission, TData>();
 
 	const useAuthGate = (): AuthState<TUser> => {
 		const runtime = useAuthGateRuntime<TUser, TPermission, TData>();
@@ -91,11 +87,11 @@ export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 	};
 
 	return {
-		AuthGateProvider,
-		Show,
-		Protect,
-		SignedIn,
-		SignedOut,
-		useAuthGate,
+		AuthGateProvider: AuthGateProvider,
+		Show: showComponents.Show,
+		Protect: showComponents.Protect,
+		SignedIn: showComponents.SignedIn,
+		SignedOut: showComponents.SignedOut,
+		useAuthGate: useAuthGate,
 	};
 }

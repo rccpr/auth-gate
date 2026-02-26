@@ -1,6 +1,6 @@
 import { createContext, type JSX, type ReactNode, use } from "react";
 import type { AuthAdapter, User } from "../adapters/adapter";
-import type { AuthState, ConflictPolicy, DecisionState } from "../core/types";
+import type { AuthGateAdapter } from "../core/create-auth-gate";
 
 /**
  * Props for the AuthGateProvider component.
@@ -171,26 +171,12 @@ export function createHooks<TAdapter extends AuthAdapter<unknown>>(
 	};
 }
 
-export type RuntimeAuthGateAdapter<
-	TUser,
-	TPermission = string,
-	TData = boolean,
-> = {
-	mode: "sync" | "async" | "hybrid";
-	useAuthState: () => AuthState<TUser>;
-	checkPermission?: (permission: TPermission) => DecisionState<TData> | Promise<DecisionState<TData>>;
-	checkPermissionSync?: (permission: TPermission) => DecisionState<TData>;
-	checkPermissionAsync?: (permission: TPermission) => Promise<DecisionState<TData>>;
-	defaultConflictPolicy?: ConflictPolicy;
-};
-
 export type AuthGateRuntimeValue<
 	TUser,
 	TPermission = string,
 	TData = boolean,
 > = {
-	adapter: RuntimeAuthGateAdapter<TUser, TPermission, TData>;
-	defaultConflictPolicy?: ConflictPolicy;
+	adapter: AuthGateAdapter<TUser, TPermission, TData>;
 };
 
 const AuthGateRuntimeContext = createContext<
