@@ -33,5 +33,6 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
-  }
+  },
+  "exclude": ["e2e", "playwright", "playwright-ct.config.ts"]
 }

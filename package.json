@@ -36,6 +36,8 @@
     "test:watch": "vitest --watch",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test -c playwright-ct.config.ts",
+    "test:e2e:ui": "playwright test -c playwright-ct.config.ts --ui",
     "typecheck": "bun x tsc --noEmit",
     "prepare": "husky"
   },
@@ -43,6 +45,8 @@
     "@biomejs/biome": "2.3.5",
     "@commitlint/cli": "19.2.2",
     "@commitlint/config-conventional": "19.2.2",
+    "@playwright/experimental-ct-react": "^1.58.2",
+    "@playwright/test": "^1.58.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/bun": "latest",
