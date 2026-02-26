@@ -1,85 +1,116 @@
 # @rccpr/auth-gate
 
-<p align='center'>
-  <img src='https://github.com/rccpr/auth-gate/blob/main/public/logo.png?raw=true' width=150 />
-</p>
+Provider-agnostic React UI authorization gates.
 
-A React library for condionally rendering components in your application with authentication gates.
+`@rccpr/auth-gate` is a client-side rendering utility. It decides what to render in the UI based on auth state and permission decisions.
 
-Partially inspired by the Clerk [Protect component](https://github.com/clerk/javascript/blob/539fad7b80ed284a7add6cf8c4c45cf4c6a0a8b2/packages/react/src/components/controlComponents.tsx#L94).
+## Security note
+
+This library does not enforce backend authorization. Keep server-side authorization checks in place for all protected operations.
 
 ## Installation
 
-
-```
-### From npm
-
 ```bash
-# npm
-npm install @rccpr/auth-gate
-
-# Yarn
-yarn add @rccpr/auth-gate
-
-# pnpm
-pnpm add @rccpr/auth-gate
-
-# Bun
 bun add @rccpr/auth-gate
 ```
 
-### From JSR
+## Core API
 
-```bash
-# Deno
-deno add @rccpr/auth-gate
+The v0 API is factory-first and `Show`-first:
 
-# npm
-npx jsr add @rccpr/auth-gate
+- `createAuthGate(adapter)`
+- `Show` (canonical)
+- `Protect` (alias of `Show`)
+- `SignedIn`
+- `SignedOut`
+- `useAuthGate`
 
-# Yarn
-yarn dlx jsr add @rccpr/auth-gate
+## Quick start
 
-# pnpm
-pnpm dlx jsr add @rccpr/auth-gate
+```tsx
+import { createAuthGate } from "@rccpr/auth-gate";
 
-# Bun
-bunx jsr add @rccpr/auth-gate
+type User = { id: string; email: string };
 
+const gate = createAuthGate<User, string>({
+	mode: "sync",
+	useAuthState: () => ({
+		user: { id: "u_1", email: "dev@example.com" },
+		isAuthenticated: true,
+		isLoading: false,
+	}),
+	checkPermission: (permission) => {
+		if (permission === "org:admin") return { status: "allowed" };
+		return { status: "denied" };
+	},
+});
 
+export const {
+	AuthGateProvider,
+	Show,
+	Protect,
+	SignedIn,
+	SignedOut,
+	useAuthGate,
+} = gate;
+```
+
+## Adapter modes
+
+- `sync`: permission decisions are immediate
+- `async`: permission decisions come from hook-managed async state (`allowed | denied | pending | error`)
+- `hybrid`: both sync and async lanes are available
+
+The decision state machine is:
+
+- `allowed`
+- `denied`
+- `pending`
+- `error`
+
+## Show examples
+
+```tsx
+<Show when="signed-in" fallback={<SignInPrompt />}>
+	<Dashboard />
+</Show>
+
+<Show when="signed-out" fallback={<Dashboard />}>
+	<MarketingPage />
+</Show>
+
+<Show
+	when={{ permission: "org:admin" }}
+	fallback={<NoAccess />}
+	loadingFallback={<LoadingAccess />}
+>
+	<AdminPanel />
+</Show>
+
+<Protect when={{ permission: "org:billing" }}>
+	<BillingSettings />
+</Protect>
+```
+
+## Hybrid conflict policy
+
+`Show` supports per-component conflict policy:
+
+- `strict` (default): async decision is authoritative
+- `optimistic`: sync decision may render first while async is pending
+
+Precedence:
+
+1. `Show` prop `conflictPolicy`
+2. adapter `defaultConflictPolicy`
+3. library default `strict`
 
 ## Development
 
-### Prerequisites
-
-- [Bun](https://bun.sh/) (for development)
-
-### Setup
-
 ```bash
 bun install
-```
-
-### Available Scripts
-
-```bash
-# Build for npm
-bun run build
-
-# Type checking
+bun run test
 bun run typecheck
-
-# Lint with Biome
 bun run lint
-
-# Fix linting issues
-bun run lint:fix
-
-# Format code
-bun run format
+bun run build
 ```
-
-
-## License
-
-MIT 
