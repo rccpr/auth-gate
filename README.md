@@ -1,5 +1,9 @@
 # @rccpr/auth-gate
 
+<p align='center'>
+  <img src='https://github.com/rccpr/auth-gate/blob/main/public/logo.png?raw=true' width=150 />
+</p>
+
 Provider-agnostic React UI authorization gates.
 
 `@rccpr/auth-gate` is a client-side rendering utility. It decides what to render in the UI based on auth state and permission decisions.
@@ -16,7 +20,7 @@ bun add @rccpr/auth-gate
 
 ## Core API
 
-The v0 API is factory-first and `Show`-first:
+The API is factory-first and `Show`-first:
 
 - `createAuthGate(adapter)`
 - `Show` (canonical)

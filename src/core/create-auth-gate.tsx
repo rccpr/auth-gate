@@ -54,7 +54,7 @@ export type ShowProps<TUser, TPermission = string> = {
 
 export type SignedInOutProps<TUser, TPermission = string> = Omit<
 	ShowProps<TUser, TPermission>,
-	"when"
+	"when" | "conflictPolicy"
 >;
 
 export type UseAuthGateOptions = {
@@ -122,10 +122,16 @@ function resolvePermissionDecision<TUser, TPermission, TData>(
 export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 	adapter: AuthGateAdapter<TUser, TPermission, TData>,
 ): AuthGateToolkit<TUser, TPermission, TData> {
-	const AuthGateProvider = ({ children }: AuthGateProviderProps): JSX.Element => {
+	const AuthGateProvider = ({
+		children,
+	}: AuthGateProviderProps): JSX.Element => {
 		const value: AuthGateRuntimeValue<TUser, TPermission, TData> = { adapter };
 
-		return <AuthGateRuntimeProvider value={value}>{children}</AuthGateRuntimeProvider>;
+		return (
+			<AuthGateRuntimeProvider value={value}>
+				{children}
+			</AuthGateRuntimeProvider>
+		);
 	};
 
 	const showComponents = createShowComponents<TUser, TPermission, TData>();
@@ -143,7 +149,11 @@ export function createAuthGate<TUser, TPermission = string, TData = boolean>(
 				runtime.adapter.defaultConflictPolicy,
 			);
 
-			return resolvePermissionDecision(runtime.adapter, permission, conflictPolicy);
+			return resolvePermissionDecision(
+				runtime.adapter,
+				permission,
+				conflictPolicy,
+			);
 		};
 
 		return {

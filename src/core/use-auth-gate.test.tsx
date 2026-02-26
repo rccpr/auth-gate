@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { AuthState, DecisionState } from "./types";
 import { createAuthGate } from "./create-auth-gate";
+import type { AuthState, DecisionState } from "./types";
 
 type TestUser = {
 	id: string;

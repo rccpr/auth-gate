@@ -5,7 +5,11 @@ describe("createAuthGate", () => {
 	it("returns provider and gate components", () => {
 		const gate = createAuthGate({
 			mode: "sync",
-			useAuthState: () => ({ user: null, isAuthenticated: false, isLoading: false }),
+			useAuthState: () => ({
+				user: null,
+				isAuthenticated: false,
+				isLoading: false,
+			}),
 			checkPermission: () => ({ status: "denied" }),
 		});
 

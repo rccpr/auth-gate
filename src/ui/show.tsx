@@ -3,9 +3,9 @@ import { useAuthGateRuntime } from "../context/auth.context.tsx";
 import type {
 	AuthGateAdapter,
 	AuthGateToolkit,
-	SignedInOutProps,
 	ShowProps,
 	ShowWhen,
+	SignedInOutProps,
 } from "../core/create-auth-gate";
 import type { AuthState, ConflictPolicy, DecisionState } from "../core/types";
 
@@ -19,7 +19,10 @@ function resolveConflictPolicy(
 }
 
 function resolveHybridDecision<TUser, TPermission, TData>(
-	adapter: Extract<AuthGateAdapter<TUser, TPermission, TData>, { mode: "hybrid" }>,
+	adapter: Extract<
+		AuthGateAdapter<TUser, TPermission, TData>,
+		{ mode: "hybrid" }
+	>,
 	permission: TPermission,
 	conflictPolicy: ConflictPolicy,
 ): DecisionState<TData> {
@@ -126,7 +129,12 @@ export function createShowComponents<
 				resolvedPolicy,
 			);
 
-			return renderByDecision(permissionDecision, children, fallback, loadingFallback);
+			return renderByDecision(
+				permissionDecision,
+				children,
+				fallback,
+				loadingFallback,
+			);
 		}
 
 		return <>{children}</>;
@@ -138,14 +146,12 @@ export function createShowComponents<
 		children,
 		fallback,
 		loadingFallback,
-		conflictPolicy,
 	}: SignedInOutProps<TUser, TPermission>): JSX.Element => {
 		return (
 			<Show
 				when="signed-in"
 				fallback={fallback}
 				loadingFallback={loadingFallback}
-				conflictPolicy={conflictPolicy}
 			>
 				{children}
 			</Show>
@@ -156,14 +162,12 @@ export function createShowComponents<
 		children,
 		fallback,
 		loadingFallback,
-		conflictPolicy,
 	}: SignedInOutProps<TUser, TPermission>): JSX.Element => {
 		return (
 			<Show
 				when="signed-out"
 				fallback={fallback}
 				loadingFallback={loadingFallback}
-				conflictPolicy={conflictPolicy}
 			>
 				{children}
 			</Show>

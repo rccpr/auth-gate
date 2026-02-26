@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { AuthState, DecisionState } from "../core/types";
 import { createAuthGate } from "../core/create-auth-gate";
+import type { AuthState, DecisionState } from "../core/types";
 
 type TestUser = {
 	id: string;
@@ -28,7 +28,10 @@ describe("Show", () => {
 
 		render(
 			<gate.AuthGateProvider>
-				<gate.Show when="signed-in" loadingFallback={<span>Loading state</span>}>
+				<gate.Show
+					when="signed-in"
+					loadingFallback={<span>Loading state</span>}
+				>
 					<span>Protected content</span>
 				</gate.Show>
 			</gate.AuthGateProvider>,
@@ -103,7 +106,10 @@ describe("Show", () => {
 
 		render(
 			<gate.AuthGateProvider>
-				<gate.Show when={{ permission: "org:admin" }} fallback={<span>Denied</span>}>
+				<gate.Show
+					when={{ permission: "org:admin" }}
+					fallback={<span>Denied</span>}
+				>
 					<span>Secret content</span>
 				</gate.Show>
 			</gate.AuthGateProvider>,

@@ -179,16 +179,26 @@ export type AuthGateRuntimeValue<
 	adapter: AuthGateAdapter<TUser, TPermission, TData>;
 };
 
-const AuthGateRuntimeContext = createContext<
-	AuthGateRuntimeValue<unknown, unknown, unknown> | null
->(null);
+const AuthGateRuntimeContext = createContext<AuthGateRuntimeValue<
+	unknown,
+	unknown,
+	unknown
+> | null>(null);
 
-type AuthGateRuntimeProviderProps<TUser, TPermission = string, TData = boolean> = {
+type AuthGateRuntimeProviderProps<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+> = {
 	value: AuthGateRuntimeValue<TUser, TPermission, TData>;
 	children: ReactNode;
 };
 
-export function AuthGateRuntimeProvider<TUser, TPermission = string, TData = boolean>({
+export function AuthGateRuntimeProvider<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+>({
 	value,
 	children,
 }: AuthGateRuntimeProviderProps<TUser, TPermission, TData>): JSX.Element {
@@ -201,10 +211,16 @@ export function AuthGateRuntimeProvider<TUser, TPermission = string, TData = boo
 	);
 }
 
-export function useAuthGateRuntime<TUser, TPermission = string, TData = boolean>(): AuthGateRuntimeValue<TUser, TPermission, TData> {
+export function useAuthGateRuntime<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+>(): AuthGateRuntimeValue<TUser, TPermission, TData> {
 	const context = use(AuthGateRuntimeContext);
 	if (!context) {
-		throw new Error("useAuthGateRuntime must be used within an AuthGateProvider");
+		throw new Error(
+			"useAuthGateRuntime must be used within an AuthGateProvider",
+		);
 	}
 
 	return context as AuthGateRuntimeValue<TUser, TPermission, TData>;
