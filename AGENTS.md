@@ -53,3 +53,9 @@ All standard dev commands are in `package.json` scripts — see README.md "Avail
 - The `commit-msg` hook references `pnpm commitlint` (not `bun`) — this may fail if pnpm is not installed. This is a known inconsistency in the repo.
 - The pre-commit hook runs `bun run typecheck` and `bun run lint:fix`.
 - Peer dependencies (`react`, `@types/react`) are installed automatically by Bun during `bun install`.
+
+### Example projects
+
+Example apps live in `examples/`. Each has its own `package.json` and `node_modules`.
+
+- **`examples/clerk-vite/`** — Clerk integration playground (Vite + React). Requires `VITE_CLERK_PUBLISHABLE_KEY` in `.env.local`. Run with `bun run dev` from that directory. Resolves `@rccpr/auth-gate` from source via Vite alias, so library changes hot-reload instantly.
