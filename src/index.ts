@@ -1,3 +1,6 @@
-export type { AuthContextType, User } from "./context/auth.context.ts";
-export { useAuth } from "./context/auth.context.ts";
-export { Gate } from "./ui/gate.tsx";
+export { createClerkAuthAdapter } from "./adapters/clerk/adapter.tsx";
+export { createStackAuthAdapter } from "./adapters/stack-auth/adapter.tsx";
+export { createHooks, useAuth } from "./context/auth.context.tsx";
+export { AuthenticatedGate } from "./ui/authenticated-gate.tsx";
+export { PermissionGate } from "./ui/permission-gate.tsx";
+export { ProtectedOrgGate } from "./ui/protected-org-gate.tsx";
