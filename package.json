@@ -25,20 +25,20 @@
     "LICENSE",
     "README.md"
   ],
-  "scripts": {
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "preinstall": "npx only-allow bun",
-    "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "test": "vitest",
-    "test:watch": "vitest --watch",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "typecheck": "bun x tsc --noEmit",
-    "prepare": "husky"
-  },
+	"scripts": {
+		"build": "tsdown",
+		"dev": "tsdown --watch",
+		"preinstall": "npx only-allow bun",
+		"lint": "biome check .",
+		"lint:fix": "biome check --write .",
+		"format": "biome format --write .",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:run": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"typecheck": "bun x tsc --noEmit",
+		"prepare": "husky"
+	},
   "devDependencies": {
     "@biomejs/biome": "2.3.5",
     "@commitlint/cli": "19.2.2",

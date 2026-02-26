@@ -5,7 +5,7 @@ const config: ViteUserConfigExport = defineConfig({
 		environment: "jsdom",
 		globals: true,
 		passWithNoTests: true,
-		setupFiles: ["./vitest.setup.ts"],
+		setupFiles: ["./src/test/setup.ts"],
 			coverage: {
 				provider: "v8",
 				reporter: ["text", "html", "json-summary"],
