@@ -55,6 +55,24 @@ describe("Show", () => {
 		expect(screen.getByText("Signed in content")).toBeInTheDocument();
 	});
 
+	it("renders fallback when signed-out user hits signed-in gate", () => {
+		const gate = createSyncGate({
+			user: null,
+			isAuthenticated: false,
+			isLoading: false,
+		});
+
+		render(
+			<gate.AuthGateProvider>
+				<gate.Show when="signed-in" fallback={<span>Denied</span>}>
+					<span>Signed in content</span>
+				</gate.Show>
+			</gate.AuthGateProvider>,
+		);
+
+		expect(screen.getByText("Denied")).toBeInTheDocument();
+	});
+
 	it("supports when='signed-out'", () => {
 		const gate = createSyncGate({
 			user: null,
