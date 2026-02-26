@@ -1,5 +1,6 @@
 import { createContext, type JSX, type ReactNode, use } from "react";
 import type { AuthAdapter, User } from "../adapters/adapter";
+import type { AuthState, ConflictPolicy, DecisionState } from "../core/types";
 
 /**
  * Props for the AuthGateProvider component.
@@ -168,4 +169,57 @@ export function createHooks<TAdapter extends AuthAdapter<unknown>>(
 	return {
 		AuthGateProvider,
 	};
+}
+
+export type RuntimeAuthGateAdapter<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+> = {
+	mode: "sync" | "async" | "hybrid";
+	useAuthState: () => AuthState<TUser>;
+	checkPermission?: (permission: TPermission) => DecisionState<TData> | Promise<DecisionState<TData>>;
+	checkPermissionSync?: (permission: TPermission) => DecisionState<TData>;
+	checkPermissionAsync?: (permission: TPermission) => Promise<DecisionState<TData>>;
+	defaultConflictPolicy?: ConflictPolicy;
+};
+
+export type AuthGateRuntimeValue<
+	TUser,
+	TPermission = string,
+	TData = boolean,
+> = {
+	adapter: RuntimeAuthGateAdapter<TUser, TPermission, TData>;
+	defaultConflictPolicy?: ConflictPolicy;
+};
+
+const AuthGateRuntimeContext = createContext<
+	AuthGateRuntimeValue<unknown, unknown, unknown> | null
+>(null);
+
+type AuthGateRuntimeProviderProps<TUser, TPermission = string, TData = boolean> = {
+	value: AuthGateRuntimeValue<TUser, TPermission, TData>;
+	children: ReactNode;
+};
+
+export function AuthGateRuntimeProvider<TUser, TPermission = string, TData = boolean>({
+	value,
+	children,
+}: AuthGateRuntimeProviderProps<TUser, TPermission, TData>): JSX.Element {
+	return (
+		<AuthGateRuntimeContext.Provider
+			value={value as AuthGateRuntimeValue<unknown, unknown, unknown>}
+		>
+			{children}
+		</AuthGateRuntimeContext.Provider>
+	);
+}
+
+export function useAuthGateRuntime<TUser, TPermission = string, TData = boolean>(): AuthGateRuntimeValue<TUser, TPermission, TData> {
+	const context = use(AuthGateRuntimeContext);
+	if (!context) {
+		throw new Error("useAuthGateRuntime must be used within an AuthGateProvider");
+	}
+
+	return context as AuthGateRuntimeValue<TUser, TPermission, TData>;
 }
